@@ -1,0 +1,26 @@
+<script type="text/javascript">
+    var url = "http://localhost:8080/demo_war_war/test/cors";
+    function sendAjaxReq() {
+        $.ajax({
+            type: "GET",
+            contentType: "application/json",
+            url: url,
+            success: function (message) {
+                console.log("成功！" + message);
+
+                // 成功里立马再发一次请求：url一样 但是POST请求
+                $.ajax({
+                    type: "POST",
+                    contentType: "application/json",
+                    url: url,
+                    success: function (message) {
+                        console.log("成功！" + message);
+                    }
+                });
+            },
+            error: function (a, b, c, d) {
+                console.log("失败！");
+            }
+        });
+    }
+</script>

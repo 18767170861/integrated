@@ -1,0 +1,176 @@
+server:
+  port: 8081
+spring:
+    freemarker:
+      template-loader-path: classpath:/templates/
+      suffix: .html
+      content-type: text/html
+      charset: UTF-8
+  # Spring Security Default user name and password
+  security:
+    user:
+    name: actuator
+    password: actuator
+    roles: ACTUATOR_ADMIN
+  autoconfigure:
+    exclude: com.alibaba.druid.spring.boot.autoconfigure.DruidDataSourceAutoConfigure
+  application:
+    name: shardingjdbc
+  main:
+    allow-bean-definition-overriding: true
+
+  # redis 哨兵模式 缓存配置
+  redis:
+    host: 10.27.56.54
+    port: 6379
+    password: 123456
+    timeout: 3000
+  lettuce:
+    pool:
+      #连接池中的最大空闲连接，默认值也是0。
+      max-idle: 16
+      #连接池中的最小空闲连接，默认值也是0。
+      min-idle: 0
+      # 如果赋值为-1，则表示不限制；如果pool已经分配了maxActive个实例，则此时pool的状态为exhausted(耗尽)。
+      # lettuce连接池大小为 2倍的CPU核数 性能最好。
+      # 连接池越大，lettuce的性能会下降，不是越大越好
+      max-active: 32
+      # 等待可用连接的最大时间，单位毫秒，默认值为-1，表示永不超时。如果超过等待时间，则直接抛出异常
+      max-wait: 10000
+  tian:
+    name: tian
+    age: 22
+    sex: M
+
+  data:
+    mongodb:
+      uri: mongodb://root:root@localhost:27017/mymongo?authSource=admin&authMechanism=SCRAM-SHA-1
+
+  #两级缓存的配置
+  cache:
+    multi:
+      caffeine:
+        expireAfterAccess: 5000
+        defaultExpiration: 60000
+    #spring cache配置
+    cache-names:
+      - userIdCache
+      - userNameCache
+
+mybatis-plus:
+  mapper-locations:
+    - classpath*:mapper/*Mapper.xml
+  #别名
+  type-aliases-package: org.wmc.integrated.entity
+  configuration:
+    map-underscore-to-camel-case: true
+    auto-mapping-behavior: full
+    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+  global-config:
+    db-config:
+      logic-delete-value: 1
+      logic-not-delete-value: 0
+
+#httpclient配置
+httpclient:
+  custom:
+    maxTotal: 100 #最大连接数
+    defaultMaxPerRoute: 20 #并发数
+    connectTimeout: 1000 #创建连接的最长时间
+    connectionRequestTimeout: 500 #从连接池中获取到连接的最长时间
+    socketTimeout: 10000 #数据传输的最长时间
+
+#SpringRetry开启日志查看效果
+logging:
+  level:
+    org:
+      springframework:
+        retry: debug
+
+# SpringBoot Actuator
+management:
+  server:
+    port: 8088
+    base-path: /base
+    address: localhost
+  endpoints:
+    # 暴露 EndPoint 以供访问，有jmx和web两种方式，exclude 的优先级高于 include
+    jmx:
+      exposure:
+        exclude: '*'
+        include: '*'
+    web:
+      base-path: /monitor
+      exposure:
+        # exclude: '*'
+        include: ["health","info","beans","mappings","logfile","metrics","shutdown","env","my"]
+        base-path: /actuator # 配置 Endpoint 的基础路径
+        cors: # 配置跨域资源共享
+          allowed-origins: http://example.com
+          allowed-methods: GET,POST
+          enabled-by-default: true # 修改全局 endpoint 默认设置
+  endpoint:
+    auditevents: # 1、显示当前引用程序的审计事件信息，默认开启
+      enabled: true
+      cache:
+        time-to-live: 10s # 配置端点缓存响应的时间
+    beans: # 2、显示一个应用中所有 Spring Beans 的完整列表，默认开启
+      enabled: true
+    conditions: # 3、显示配置类和自动配置类的状态及它们被应用和未被应用的原因，默认开启
+      enabled: true
+    configprops: # 4、显示一个所有@ConfigurationProperties的集合列表，默认开启
+      enabled: true
+    env: # 5、显示来自Spring的 ConfigurableEnvironment的属性，默认开启
+      enabled: true
+    flyway: # 6、显示数据库迁移路径，如果有的话，默认开启
+      enabled: true
+    health: # 7、显示健康信息，默认开启
+      enabled: true
+      show-details: always
+    info: # 8、显示任意的应用信息，默认开启
+      enabled: true
+    liquibase: # 9、展示任何Liquibase数据库迁移路径，如果有的话，默认开启
+      enabled: true
+    metrics: # 10、展示当前应用的metrics信息，默认开启
+      enabled: true
+    mappings: # 11、显示一个所有@RequestMapping路径的集合列表，默认开启
+      enabled: true
+    scheduledtasks: # 12、显示应用程序中的计划任务，默认开启
+      enabled: true
+    sessions: # 13、允许从Spring会话支持的会话存储中检索和删除(retrieval and deletion)用户会话。使用Spring Session对反应性Web应用程序的支持时不可用。默认开启。
+      enabled: true
+    shutdown: # 14、允许应用以优雅的方式关闭，默认关闭
+      enabled: true
+    threaddump: # 15、执行一个线程dump
+      enabled: true
+    # web 应用时可以使用以下端点
+    heapdump: # 16、 返回一个GZip压缩的hprof堆dump文件，默认开启
+      enabled: true
+    jolokia: # 17、通过HTTP暴露JMX beans（当Jolokia在类路径上时，WebFlux不可用），默认开启
+      enabled: true
+    logfile: # 18、返回日志文件内容（如果设置了logging.file或logging.path属性的话），支持使用HTTP Range头接收日志文件内容的部分信息，默认开启
+      enabled: true
+    prometheus: #19、以可以被Prometheus服务器抓取的格式显示metrics信息，默认开启
+      enabled: true
+  health:
+    db:
+      enabled: false
+    redis:
+      enabled: false
+    mail:
+      enabled: false
+    mongo:
+      enabled: false
+    solr:
+      enabled: false
+    elasticsearch:
+      enabled: false
+
+info:
+  app:
+    name: @project.name@
+    description: @project.description@
+    version: @project.version@
+    encoding: @project.build.sourceEncoding@
+    java:
+      version: @java.version@
